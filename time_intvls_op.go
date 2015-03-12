@@ -107,6 +107,8 @@ func (tis TimeIntervals) Exclude(excl *TimeInterval) (res TimeIntervals) {
 // dups - intervals that duplicate originals,
 // overs - parts of intervals that overlap with originals
 // and need to be deleted.
+// Name of each interval is preserved and can be used as meta data.
+// Each overlap name contains both names, comma-separated.
 func (tis TimeIntervals) AnalyzeOverlaps() (origs, dups, overs []*TimeInterval) {
 
 	nextOrigIdx := 0
@@ -153,7 +155,9 @@ func (tis TimeIntervals) AnalyzeOverlaps() (origs, dups, overs []*TimeInterval) 
 
 			// Overlap ? Next starts before current ends
 			if ti.Te.Sub(tiNext.Ts) > 0 {
-				overs = append(overs, tiNext.TrimRight(ti.Te))
+				over := tiNext.TrimRight(ti.Te)
+				over.Name = ti.Name + "," + tiNext.Name
+				overs = append(overs, over)
 
 				/*
 					if j == 0 {
